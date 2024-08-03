@@ -1,0 +1,11 @@
+- block:
+    - name: Install the bot
+      shell: git clone https://github.com/William-DQN/LeMecGenereux.git
+      args:
+        chdir: /home/ansible/discord-bot/LemecGenereux
+
+    - name: run the bot
+      shell: python3 /home/ansible/discord-bot//LemecGenereux/LeMecGenereux/bot.py
+
+  become: yes
+  become_user: root

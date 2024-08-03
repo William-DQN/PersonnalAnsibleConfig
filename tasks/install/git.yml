@@ -1,0 +1,8 @@
+-block:
+  - name: Install git
+      apt:
+        name: git
+        state: present
+  become: yes
+  become_user: root
+```
