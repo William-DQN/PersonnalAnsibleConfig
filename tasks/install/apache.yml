@@ -1,0 +1,58 @@
+#install Apache server
+- name: Install Apache
+  apt:
+    name: apache2
+    state: present
+  become: yes
+  tags: apache
+#install PHP
+- name: Install PHP
+  apt:
+    name: php
+    state: present
+  become: yes
+  tags: apache
+#install PHP modules
+- name: Install PHP modules
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libapache2-mod-php
+    - php-mysql
+  become: yes
+  tags: apache
+#install MySQL
+- name: Install MySQL
+  apt:
+    name: mysql-server
+    state: present
+  become: yes
+  tags: apache
+#install PHPMyAdmin
+- name: Install PHPMyAdmin
+  apt:
+    name: phpmyadmin
+    state: present
+  become: yes
+  tags: apache
+#install PHPMyAdmin configuration
+- name: Configure PHPMyAdmin
+  template:
+    src: phpmyadmin.conf.j2
+    dest: /etc/apache2/conf-available/phpmyadmin.conf
+  become: yes
+  tags: apache
+#enable PHPMyAdmin configuration
+- name: Enable PHPMyAdmin configuration
+  command: a2enconf phpmyadmin
+  become: yes
+  tags: apache
+#restart Apache
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
+  become: yes
+  tags: apache
+  

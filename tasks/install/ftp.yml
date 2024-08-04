@@ -13,7 +13,7 @@
         enabled: yes
     - name: Configure vsftpd
       template:
-        src: vsftpd.conf.j2
+        src: template/vsftpd/vsftpd.conf.j2
         dest: /etc/vsftpd.conf
     - name: Restart vsftpd
       service:

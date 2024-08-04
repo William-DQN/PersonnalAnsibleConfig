@@ -5,7 +5,7 @@
         chdir: /home/ansible/discord-bot/LemecGenereux
 
     - name: run the bot
-      shell: python3 /home/ansible/discord-bot//LemecGenereux/LeMecGenereux/bot.py
+      shell: python3 /home/ansible/discord-bot/LemecGenereux/LeMecGenereux/bot.py
 
   become: yes
   become_user: root
