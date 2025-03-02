@@ -1,3 +1,7 @@
 discord.py
 requests
 beautifulsoup4
+ffmpeg
+pytz
+asyncio
+pynacl

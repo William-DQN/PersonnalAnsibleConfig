@@ -1,18 +1,35 @@
 #Setting up the zabbic agent
-- name: Install Zabbix Agent
-  apt:
-    name: zabbix-agent
-    state: present
-  notify: restart zabbix-agent
+- name: Install the Zabbix Agent on the server
+  block:
+    - name: Download Zabbix repository package
+      get_url:
+        url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu24.04_all.deb
+        dest: /tmp/zabbix-release.deb
+    
+    - name: Install Zabbix repository package
+      dpkg:
+        name: /tmp/zabbix-release.deb
+      register: zabbix_repo_installed
+    
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: zabbix_repo_installed is changed
+    
+    - name: Install Zabbix Agent
+      apt:
+        name: zabbix-agent
+        state: present
+      notify: restart zabbix-agent
 
-- name: Configure Zabbix Agent
-  template:
-    src: zabbix_agentd.conf.j2
-    dest: /etc/zabbix/zabbix_agentd.conf
-  notify: restart zabbix-agent
+    - name: Configure Zabbix Agent
+      template:
+        src: zabbix_agentd.conf.j2
+        dest: /etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix-agent
 
-- name: Start Zabbix Agent
-  service:
-    name: zabbix-agent
-    state: started
-    enabled: yes
+    - name: Start Zabbix Agent
+      service:
+        name: zabbix-agent
+        state: started
+        enabled: yes

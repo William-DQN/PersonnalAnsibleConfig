@@ -1,2 +1,4 @@
-inventory.yml
+hosts.yml
 .vault-pass
+config.json.j2
+birthday.json.j2

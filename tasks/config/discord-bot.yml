@@ -1,11 +1,68 @@
-- block:
-    - name: Install the bot
-      shell: git clone https://github.com/William-DQN/LeMecGenereux.git
-      args:
-        chdir: /home/ansible/discord-bot/LemecGenereux
+- name: Configure and run Discord bot
+  block:
+    - name: Install ffmpeg
+      apt:
+        name: ffmpeg
+        state: present
+        
+    - name: Create the bot directory
+      file:
+        state: "directory"
+        mode: "0755"
+        owner: "{{ become_user }}"
+        group: "{{ become_user }}"
+        recurse: yes
+        path: "/home/{{become_user}}/discord-bot"
+  
+    - name: Create the bot's logs directory
+      file:
+        state: "directory"
+        mode: "0644"
+        path: "/var/log/discord-bot"
 
-    - name: run the bot
-      shell: python3 /home/ansible/discord-bot/LemecGenereux/LeMecGenereux/bot.py
+    - name: Clone or update the bot repository
+      git:
+        repo: "{{ repository }}"
+        dest: "/home/{{become_user}}/discord-bot"
+        force: yes
+    
+    - name: Change the permissions and the owner of the repository's file
+      file:
+        state: "directory"
+        mode: "0755"
+        owner: "{{ become_user }}"
+        group: "{{ become_user }}"
+        recurse: yes
+        path: "/home/{{become_user}}/discord-bot"
 
-  become: yes
-  become_user: root
+    - name: Create systemd service for the bot
+      template:
+        src: "{{discord_bot_templates}}/discord-bot.service.j2"
+        dest: /etc/systemd/system/discord-bot.service
+        mode: "0644"
+
+    - name: Create the birthday variables for the bot
+      template:
+        src: "{{discord_bot_templates}}/birthday.json.j2"
+        dest: "/home/{{become_user}}/discord-bot/birthday.json"
+        mode: "0755"
+        owner: "{{ become_user }}"
+        group: "{{ become_user }}"
+
+    - name: Create the other variables for the bot
+      template:
+        src: "{{discord_bot_templates}}/config.json.j2"
+        dest: "/home/{{become_user}}/discord-bot/config.json"
+        mode: "0755"
+        owner: "{{ become_user }}"
+        group: "{{ become_user }}"
+
+    - name: Reload systemd to register the new service
+      command: systemctl daemon-reload
+
+    - name: Enable and start Discord bot service
+      systemd:
+        name: discord-bot
+        enabled: yes
+        state: started
+        scope: system
