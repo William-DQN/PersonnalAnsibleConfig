@@ -1,0 +1,16 @@
+- name: Using a template to change the current keyboard and apply changes
+  block:
+    - name: install locales-all for the encode format
+      apt:
+        name: locales-all
+        state: present
+
+    - name: Pushing language template
+      template:
+        src: "{{ ssh_templates }}/language.j2"
+        dest: "/etc/default/locale"
+        mode: "0644"
+        
+    - name: Apply language configuration
+      command: setupcon
+  tags: language

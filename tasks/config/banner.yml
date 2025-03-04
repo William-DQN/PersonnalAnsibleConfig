@@ -1,0 +1,9 @@
+- name: Using a template to create a banner
+  template:
+    src: "{{ ssh_templates }}/{{custombanner}}.j2"
+    dest: "{{ ssh_directory }}/custombanner"
+    mode: "0755"
+    owner: "{{ become_user }}"
+    group: "{{ become_user }}"
+  tags:
+  - banner

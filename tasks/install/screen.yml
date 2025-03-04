@@ -1,0 +1,6 @@
+- name: Installing Screen
+  block:
+    - name: Install Screen
+      apt:
+        name: screen
+        state: present

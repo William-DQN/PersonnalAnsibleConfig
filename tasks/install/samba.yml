@@ -1,0 +1,79 @@
+- name: Configure Samba server and users
+  block:
+    - name: Install Samba
+      apt:
+        name: samba
+        state: present
+    - name: Creating the samba path
+      file:
+        path: "{{ samba_path }}/"
+        state: directory
+        mode: "0755"
+        
+    - name: Set up main and subdirectories for Samba
+      file:
+        path: "{{ samba_path_private }}/{{ item.path }}"
+        state: directory
+        mode: "0700"
+        owner: "{{smb_user1}}"
+        group: "sambashare"
+      loop:
+        - { path: "documents" }
+        - { path: "videos/secrets" }
+      loop_control:
+        label: "{{ item.path }}"
+    
+    - name: Set up main and subdirectories for Samba
+      file:
+        path: "{{ samba_path_public }}/{{ item.path }}"
+        state: directory
+        mode: "0777"
+        owner: "nobody"
+        group: "nogroup"
+      loop:
+        - { path: "videos" }
+        - { path: "images" }
+        - { path: "musics" }
+        - { path: "images/memes" }
+        - { path: "images/souvenirs" }
+        - { path: "videos/ytp" }
+        - { path: "videos/movies" }
+        - { path: "musics/artists" }
+        - { path: "musics/soundboard" }
+      loop_control:
+        label: "{{ item.path }}"
+  
+        
+    - name: Changing the config file
+      template:
+        src: "{{ samba_template }}/smb.conf.j2"
+        dest: "/etc/samba/smb.conf"
+        mode: "0644"
+      notify: Restart Samba
+
+    - name: Ensure Samba Linux users exist and configure passwords
+      block:
+        - name: Create Samba users and add to sambashare group
+          user:
+            name: "{{ item.name }}"
+            state: present
+            groups: "sambashare"
+          loop: "{{ samba_users }}"
+          loop_control:
+            loop_var: item
+
+        - name: Set Samba password for each user
+          command: "echo -ne '{{ item.password }}\n{{ item.password }}\n' | smbpasswd -s -a {{ item.name }}"
+          args:
+            creates: "/var/lib/samba/private/{{ item.name }}.tdb"
+          loop: "{{ samba_users }}"
+          loop_control:
+            loop_var: item
+          when: "itemname is not defined"
+
+        - name: Enable each Samba user
+          command: "smbpasswd -e {{ item.name }}"
+          loop: "{{ samba_users }}"
+          loop_control:
+            loop_var: item
+  tags: samba

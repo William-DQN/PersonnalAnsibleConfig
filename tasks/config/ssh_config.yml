@@ -1,0 +1,7 @@
+- name: Push the new SSH configuration file
+  template:
+    src: "{{ ssh_templates }}/{{ sshd_config }}.j2"
+    dest: "{{ ssh_directory }}/{{ sshd_config }}"
+    mode: "0644"
+  notify: Restart SSH
+  tags: ssh

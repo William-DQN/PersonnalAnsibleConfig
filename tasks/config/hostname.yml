@@ -1,0 +1,10 @@
+- name: Using a template to change the hostname
+  block:
+    - name: Using a template to change the hostname
+      template:
+        src: "{{ hostname_templates }}/hostname.j2"
+        dest: "/etc/hostname"
+        mode: "0644"
+
+  tags:
+  - hostname

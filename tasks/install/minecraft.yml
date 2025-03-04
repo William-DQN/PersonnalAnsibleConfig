@@ -1,0 +1,53 @@
+- name: Installing the minecraft package
+  block: 
+    - name: Create the group
+      group:
+        name: minecraft_user
+        gid: 740
+        state: present
+
+    - name: Create the user
+      user:
+        name: minecraft_user
+        home: "{{minecraft_path}}"
+        uid: 740
+        group: minecraft_user
+        shell: /usr/sbin/nologin
+
+    - name: Make a recursive owning
+      file:
+        path: "{{minecraft_path}}"
+        state: directory
+        recurse: yes
+        owner: minecraft_user
+        group: minecraft_user
+      
+    - name: Creating the java directory
+      file:
+        path: "{{minecraft_path}}/java"
+        state: directory
+        owner: minecraft_user
+        group: minecraft_user
+
+    - name: Download Minecraft repository package
+      get_url:
+        url: https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar
+        dest: "{{minecraft_path}}/java"
+        owner: minecraft_user
+        group: minecraft_user
+    
+    - name: Rename the server.jar with the latest version
+      copy:
+        remote_src: True
+        src: "{{minecraft_path}}/java/server.jar"
+        dest: "{{minecraft_path}}/java/minecraft_server.{{server_version }}.jar"
+        owner: minecraft_user
+        group: minecraft_user
+      
+    - name: Remove the unecessary server.jar
+      file:
+        path: "{{minecraft_path}}/java/server.jar"
+        state: absent
+    
+
+    

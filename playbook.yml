@@ -1,0 +1,177 @@
+---
+- hosts: dev
+  gather_facts: yes
+  become: yes
+  become_user: root
+  vars:
+    samba_users:
+      - { name: "{{smb_user1}}", password: "{{smb_user1_password}}" }
+  tasks:
+    - name: Update and Upgrade
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/update.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: always
+      
+    - name: Pushing networking templates
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/networking.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: network
+
+    - name: Pushing hostname template
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/hostname.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: banner
+
+    - name: Pushing banner templates
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/banner.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: banner
+
+    - name: Pushing SSH templates
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/ssh_config.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: ssh
+
+    - name: Changing firewall rules
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/firewall.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: firewall
+
+    - name: Pushing language templates
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/language.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: language
+
+    - name: Pushing keyboard templates
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/keyboard.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: keyboard
+    
+    - name: Installing Pyhton
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/python.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: python
+    
+    - name: Installing Nginx
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/nginx.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: nginx 
+
+    - name: Installing the python bot
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/discord-bot.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: bot
+
+    - name: Installing Chronyd
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/chrony.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: chrony
+    
+    - name: Changing the cron
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/crontabs.yml"
+      with_items:
+        - { tasks: "tasks", name: "config" }
+      tags: cron
+
+    - name: Installing Samba
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/samba.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: samba
+
+    - name: Installing Fail2ban
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/fail2ban.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: fail2ban
+    
+    - name: Installing Java
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/java.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: java
+
+    - name: Installing Screen
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/screen.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: screen
+
+    - name: Handeling the Minecraft management
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/minecraft.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: minecraft
+      
+    - name: Installing Clamav
+      include_tasks: "{{ item.tasks }}/{{ item.name }}/clamav.yml"
+      with_items:
+        - { tasks: "tasks", name: "install" }
+      tags: clamav
+
+  handlers:
+    - name: Restart Systemd-networkd
+      service:
+        name: systemd-networkd
+        state: restarted
+      become: yes
+
+    - name: Reload UFW
+      command: ufw reload
+      become: yes
+
+    - name: Restart SSH
+      systemd:
+        name: ssh
+        state: restarted
+      become: yes
+
+    - name: Restart Chrony
+      service:
+        name: chrony
+        state: restarted
+      become: yes
+
+    - name: Restart Clamav
+      service:
+        name: clamav
+        state: restarted
+      become: yes
+
+    - name: Restart Samba
+      service:
+        name: smbd.service
+        state: restarted
+      become: yes
+
+
+# - hosts: dev
+#   gather_facts: yes
+#   become: yes
+#   become_user: "{{become_user}}"
+#   tasks:
+#     - name: Install Zabbix 
+#       include_tasks: "{{ item.tasks }}/{{ item.name }}/zabbix.yml"
+#       with_items:
+#         - { tasks: "tasks", name: "install" }
+#       tags: zabbix
+
+#   handlers:
+#     - name: restart zabbix-agent
+#       service:
+#         name: zabbix-agent
+#         state: restarted
+#       become: yes
+  

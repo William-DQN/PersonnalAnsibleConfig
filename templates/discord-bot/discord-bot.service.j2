@@ -1,0 +1,15 @@
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+User={{ become_user }}
+WorkingDirectory=/home/{{ become_user }}/discord-bot
+ExecStart={{ personal_env_path }}/{{ myenv }}/bin/python /home/{{ become_user }}/discord-bot/bot.py
+Restart=always
+StandardOutput=append:/var/log/discord-bot/discord-bot.log
+StandardError=append:/var/log/discord-bot/discord-bot_errors.log
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target

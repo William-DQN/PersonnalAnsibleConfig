@@ -1,0 +1,13 @@
+- name: Install the chrony process
+  block:
+    - name: Install the chronyd service
+      apt:
+        name: chrony
+        state: present
+    
+    - name: change the chrony config
+      template:
+        src: "{{ chrony_template }}/chronyd.j2"
+        dest: "/etc/chrony/chrony.conf"
+        mode: "0644"
+      notify: Restart Chrony

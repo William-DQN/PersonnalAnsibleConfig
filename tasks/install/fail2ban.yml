@@ -1,0 +1,12 @@
+- name: manipulation to install and to configure the fail2ban service
+  block:
+    - name: Install the service
+      apt:
+        name: fail2ban
+        state: present
+        
+    - name: Make a backup of the jail.conf file
+      copy:
+        src: /etc/fail2ban/jail.conf
+        dest: /etc/fail2ban/jail.conf-backup
+    

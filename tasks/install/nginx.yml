@@ -1,0 +1,6 @@
+- name: Installing the nginx packages
+  block:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present

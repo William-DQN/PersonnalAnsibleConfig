@@ -1,0 +1,11 @@
+- name: update and upgrade
+  block:
+    - name: update
+      apt:
+        name: "*"
+        state: latest
+
+    - name: upgrade  
+      apt:
+        upgrade: dist
+    

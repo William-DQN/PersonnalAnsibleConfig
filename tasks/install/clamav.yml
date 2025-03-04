@@ -1,0 +1,11 @@
+- name: Install the clamav process
+  block:
+    - name: Install the clamav service
+      apt:
+        name: clamav
+        state: present
+    
+    - name: Updating the clamav database
+      command: freshclam
+      become: yes
+      notify: Restart Clamav

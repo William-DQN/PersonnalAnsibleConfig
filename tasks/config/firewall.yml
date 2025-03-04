@@ -1,0 +1,37 @@
+- name: Modifying the SSH config and firewall rules
+  block:
+    - name: Open the new SSH port in ufw
+      ufw:
+        rule: allow
+        port: "{{ ssh_port }}"
+        proto: tcp
+      notify: Reload UFW
+    
+    - name: Open the new SSH port in ufw
+      ufw:
+        rule: allow
+        port: "{{ ssh_port }}"
+        proto: tcp
+      notify: Reload UFW
+    
+    - name: Open the minecraft port in ufw
+      ufw:
+        rule: allow
+        port: "{{minecraft_port}}"
+      notify: Reload UFW
+
+    - name: Close the old SSH port in ufw
+      ufw:
+        rule: deny
+        port: 22
+        proto: tcp
+      notify: Reload UFW
+
+    - name: Close the telnet port in ufw
+      ufw:
+        rule: deny
+        port: 23
+        proto: tcp
+      notify: Reload UFW
+
+  tags: firewall

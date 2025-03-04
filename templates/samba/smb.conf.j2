@@ -1,0 +1,60 @@
+#======================= Global Settings =======================
+[global]
+   browsable=yes
+   security=user
+   map to guest = bad user
+   guest account=nobody
+   encrypt passwords=yes
+   log file = /var/log/samba/log.%m
+   passwd program = /usr/bin/passwd %u
+   passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+   logging = file
+   max log size = 1000
+   panic action = /usr/share/samba/panic-action %d
+   unix password sync = yes
+
+#======================= Public Settings =======================
+[Public]
+   path="{{ samba_path_public }}"
+   comment=public
+   public=yes
+   only guest=yes
+   guest ok=yes
+   browsable=yes
+   read only=no
+   writable=yes
+   create mode=770
+   create mask=0770
+   directory mask=0770
+
+
+#======================= Private Settings =======================
+[Private]
+   path="{{ samba_path_private }}"
+   comment=private
+   public=no
+   only guest=no
+   browsable=yes
+   read only=no
+   valid users="{{ smb_user1 }}"
+   invalid users=nobody
+   writable=yes
+   create mask=0700
+   directory mask=0700
+
+
+[printers]
+   comment = All Printers
+   browseable = no
+   path = /var/tmp
+   printable = yes
+   guest ok = no
+   read only = yes
+   create mask = 0700
+
+[print$]
+   comment = Printer Drivers
+   path = /var/lib/samba/printers
+   browseable = yes
+   read only = yes
+   guest ok = no

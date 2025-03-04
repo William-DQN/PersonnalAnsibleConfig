@@ -1,0 +1,18 @@
+- name: Changing the network configuration
+  block:
+    - name: Delete the temporary configuration
+      file:
+        path: /run/systemd/network/10-netplan-eth0.network
+        state: absent
+      become: yes
+      
+    - name: Push the new netplan configuration file
+      template:
+        src: "{{ netplan_template }}/{{ip_address_file}}.j2"
+        dest: "{{ netplan_path }}/{{ip_address_file}}"
+        mode: "0644"
+
+    - name: Apply the netplan config
+      command: netplan apply
+      notify: Restart Systemd-networkd
+  tags: network

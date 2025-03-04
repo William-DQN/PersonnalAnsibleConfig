@@ -1,0 +1,62 @@
+- name: Pushing the crontabs and the scripts
+  block:
+    - name: Ajouter la tâche pour Epic Games Checker
+      cron:
+        name: "Epic Games Checker"
+        minute: "50"
+        hour: "17"
+        weekday: "4"
+        job: "/bin/bash {{ scripts_path }}/launch_epic_games_checker.sh"
+        state: present
+
+    - name: Ajouter la tâche pour Happy New Year Checker
+      cron:
+        name: "Happy New Year Checker"
+        minute: "1"
+        hour: "23"
+        day: "31"
+        month: "12"
+        job: "/bin/bash {{ scripts_path }}/launch_happy_new_year_checker.sh"
+        state: present
+
+    - name: Ajouter la tâche pour Merry Christmas Checker
+      cron:
+        name: "Merry Christmas Checker"
+        minute: "25"
+        hour: "11"
+        day: "25"
+        month: "12"
+        job: "/bin/bash {{ scripts_path }}/launch_merry_xmas_checker.sh"
+        state: present
+
+    - name: Ajouter la tâche pour Birthday Checker
+      cron:
+        name: "Birthday Checker"
+        minute: "50"
+        hour: "17"
+        job: "/bin/bash {{ scripts_path }}/launch_birthday_checker.sh"
+        state: present
+
+    - name: Ajouter la tâche pour Free Steam Games Checker
+      cron:
+        name: "Free Steam games checker"
+        minute: "0"
+        hour: "18"
+        weekday: "0,3,6"
+        job: "/bin/bash {{ scripts_path }}/launch_free_steam_games_checker.sh"
+        state: present
+
+    - name: Creating the scripts directory
+      file:
+        state: "directory"
+        mode: "0755"
+        recurse: yes
+        path: "{{scripts_path}}"
+
+    - name: Pushing all the scripts
+      with_fileglob:
+        - "{{ scripts_template }}/*.j2"
+      template:
+        src: "{{ item }}"
+        dest: "{{ scripts_path }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+  tags: cron
